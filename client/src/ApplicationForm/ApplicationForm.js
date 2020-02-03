@@ -1,6 +1,9 @@
 import React from "react";
 import { Formik, Form, Field, getIn } from "formik";
+import Swal from "sweetalert2";
 import "./ApplicationForm.css";
+
+const SERVICE_URL = "https://lf-py-api.herokuapp.com/";
 
 const initialState = {
   business: {
@@ -51,8 +54,15 @@ export default class ApplicationForm extends React.Component {
             <div className="row">
               <Formik
                 initialValues={this.state}
-                onSubmit={values => {
-                  console.log(values);
+                onSubmit={async values => {
+                  const application = { application: values };
+                  const response = await fetch(SERVICE_URL, {
+                    method: "POST",
+                    body: JSON.stringify(application),
+                    mode: "cors"
+                  });
+                  const data = await response.json();
+                  Swal.fire(data.message);
                 }}
               >
                 {({ errors, touched }) => {
@@ -173,7 +183,7 @@ export default class ApplicationForm extends React.Component {
                           <Field
                             id="requested_amount"
                             name="requested_amount"
-                            type="text"
+                            type="number"
                             className="form-control"
                             validate={this.validatePresence}
                           />
